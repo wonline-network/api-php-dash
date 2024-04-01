@@ -20,7 +20,7 @@ if (version_compare(phpversion(), '7.0.0', '<')) {
  * contactar a info@wonline.network.
  */
 
-class ApiWonline {
+class DashWonline {
     private string $base_url;
     private string $authtoken;
     private $curl;
@@ -46,35 +46,28 @@ class ApiWonline {
      * @throws Exception
      */
     public function crearCliente(array $datosCliente): string {
-        // Endpoint para la creación del cliente
-        $path = "clientes";
-        $headers = ['Content-Type: application/json'];
-        $data = json_encode($datosCliente);
 
         // Enviar solicitud para crear el cliente
-        $respuestaCliente = $this->post($path, $data, $headers);
+        $respuestaCliente = $this->post("customers", $datosCliente);
         $resultadoCliente = json_decode($respuestaCliente, true);
 
+
         // Verificar la respuesta de la creación del cliente
-        if (!empty($resultadoCliente) && $resultadoCliente['status']) {
+        if ($resultadoCliente['status']) {
             // Si se indica que el cliente fue añadido exitosamente, buscar al cliente para obtener su ID
             // Asumiendo que 'company' puede usarse para buscar de manera única al cliente
             // Buscar al cliente por el nombre de la empresa
+
             $clientes = json_decode(
-                $this->buscarCliente(
-                    $datosCliente['company']
-                ), true
+                $this->buscarCliente(preg_replace('/\s+(S\.A\.|S\.L\.|LLC|Inc\.|Corp\.)$/i', '', $datosCliente['company'])), true
             );
 
-            // Implementar la lógica para seleccionar al cliente correcto de la lista, si es necesario
-            // Esto es un ejemplo simplificado, ajusta según la estructura de tu respuesta de búsqueda
-            foreach ($clientes as $cliente) {
-                if ($cliente['name'] === $datosCliente['company']) {
-                    return $cliente['clientid']; // Devolver el ID del cliente encontrado
-                }
+            if($clientes[0]){
+                return $clientes[0]['userid']; // Devolver el ID del cliente encontrado
             }
 
             return "Cliente creado, pero no se encontró en la búsqueda inmediata.";
+
         } else {
             // Manejar el caso de error en la creación
             return "Error al crear el cliente: " . $resultadoCliente['message'];
@@ -89,11 +82,8 @@ class ApiWonline {
      * @throws Exception
      */
     public function InfoCliente(int $id): string {
-        $path = "customers/{$id}"; // Construye el path con el ID del cliente.
-        $headers = [
-            'Authorization: Bearer ' . $this->authtoken // Usa el token de autenticación configurado.
-        ];
-        return $this->get($path, $headers);
+        // Construye el path con el ID del cliente.
+        return $this->get("customers/{$id}");
     }
 
     /**
@@ -105,10 +95,7 @@ class ApiWonline {
      */
     public function eliminarCliente(int $id): string {
         $path = "delete/customers/{$id}"; // Construye el path con el ID del cliente.
-        $headers = [
-            'Authorization: Bearer ' . $this->authtoken // Usa el token de autenticación configurado.
-        ];
-        return $this->delete($path, $headers);
+        return $this->delete($path);
     }
 
     /**
@@ -119,8 +106,7 @@ class ApiWonline {
      * @throws Exception
      */
     public function buscarCliente(string $keysearch): string {
-        $path = "customers/search/{$keysearch}";
-        return $this->get($path);
+        return $this->get("customers/search/{$keysearch}");
     }
 
     /**
@@ -130,10 +116,8 @@ class ApiWonline {
      * @return string Respuesta de la API.
      */
     public function agregarNuevaFactura(array $datosFactura): string {
-        $path = "invoices"; // Endpoint para agregar una nueva factura.
-        $headers = ['Content-Type: application/json']; // Asume que la API espera JSON.
-        $data = json_encode($datosFactura); // Codifica los datos de la factura a JSON.
-        return $this->post($path, $data, $headers);
+        // Endpoint para agregar una nueva factura.
+        return $this->post("invoices", $datosFactura);
     }
 
     /**
@@ -174,25 +158,70 @@ class ApiWonline {
         }
     }
 
+    public function addItemAFactura(array &$datosFactura, array $item) {
+            // Inicializar 'newitems' como array si aún no se ha hecho
+            if (!isset($datosFactura['newitems'])) {
+                $datosFactura['newitems'] = [];
+            }
+
+            // El índice para el nuevo ítem se basa en la cantidad de ítems actualmente en 'newitems'
+            $index = count($datosFactura['newitems']);
+
+            // Construye el nuevo ítem y añádelo al array 'newitems'
+            $nuevoItem = [
+                "description" => $item['description'],
+                "long_description" => $item['long_description'],
+                "qty" => $item['qty'],
+                "rate" => $item['rate'],
+                "order" => $item['order'],
+                "unit" => $item['unit'],
+                "taxname" => isset($item['taxname']) ? $item['taxname'] : []
+            ];
+
+            // Añade el nuevo ítem a 'newitems' usando el índice calculado
+            foreach ($nuevoItem as $key => $value) {
+                if ($key === "taxname" && is_array($value)) {
+                    // Para 'taxname' que es un array, manejar cada valor de taxname individualmente
+                    foreach ($value as $taxIndex => $taxValue) {
+                        $datosFactura["newitems[$index][$key][$taxIndex]"] = $taxValue;
+                    }
+                } else {
+                    // Para todos los otros campos del ítem
+                    $datosFactura["newitems[$index][$key]"] = $value;
+                }
+            }
+
+            return $datosFactura;
+    }
+
+    /**
+     * Solicita la información de los impuestos.
+     *
+     * @return string Respuesta de la API.
+     */
+    public function solicitarDatosImpuestos(): string {
+        return $this->get("common/tax_data");
+    }
+
     /**
      * @throws Exception
      */
     public function get($path, array $headers = []): string {
-        return $this->request($path, 'GET', null, $headers);
+        return $this->request('GET', $path, null, $headers);
     }
 
     /**
      * @throws Exception
      */
     public function post($path, $data, array $headers = []): string {
-        return $this->request($path, 'POST', $data, $headers);
+        return $this->request('POST', $path,  $data, $headers);
     }
 
     /**
      * @throws Exception
      */
     public function put($path, $data, array $headers = []): string {
-        return $this->request($path, 'PUT', $data, $headers);
+        return $this->request('PUT', $path, $data, $headers);
     }
 
     /**
@@ -207,13 +236,15 @@ class ApiWonline {
      *
      * @param string $method Método HTTP ('GET', 'POST', 'PUT', 'DELETE').
      * @param string $path Ruta del endpoint de la API.
-     * @param mixed $data Datos a enviar con la solicitud.
+     * @param mixed|null $data Datos a enviar con la solicitud.
      * @param array $headers Headers adicionales para la solicitud.
      * @return string Respuesta de la API.
      * @throws Exception
      */
-    private function request($method, $path, $data = null, array $headers = []): string {
+    private function request(string $method, string $path,  $data = null, array $headers = []): string {
         $url = $this->base_url . $path;
+        echo $url."\n";
+        print_r($data);
         $headers = $this->addAuthorizationHeader($headers);
 
         curl_setopt_array($this->curl, [
@@ -221,17 +252,8 @@ class ApiWonline {
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POSTFIELDS => $data
         ]);
-
-        if (!empty($data)) {
-            if (is_array($data)) {
-                $data = json_encode($data);
-                curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
-                // Asegúrate de que 'Content-Type: application/json' esté en $headers si es necesario
-            } else {
-                curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
-            }
-        }
 
         $response = curl_exec($this->curl);
         if ($response === false) {
@@ -241,7 +263,7 @@ class ApiWonline {
         return $response;
     }
     private function addAuthorizationHeader(array $headers): array {
-        $headers[] = 'Authorization: Bearer ' . $this->authtoken;
+        $headers[] = 'authtoken: '.$this->authtoken;
         return $headers;
     }
     public function __destruct() {

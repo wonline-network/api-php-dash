@@ -1,8 +1,8 @@
 <?php
 
-require_once 'DashWonline.php';
+require_once 'src/DashWonline.php';
 
-$api = new ApiWonline("tuCuentaCliente", "tuTokenDeAutenticacion");
+$api = new ApiWonline("angel", "tuTokenDeAutenticacion");
 
 // Datos de la nueva factura
 $datosFactura = [

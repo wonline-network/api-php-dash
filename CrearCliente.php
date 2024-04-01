@@ -1,6 +1,6 @@
 <?php
 
-require_once 'DashWonline.php';
+require_once 'src/DashWonline.php';
 
 $api = new ApiWonline("tuCuentaCliente", "tuTokenDeAutenticacion");
 
