@@ -39,20 +39,46 @@ class ApiWonline {
     }
 
     /**
-     * Crea un nuevo cliente en el sistema.
+     * Crea un nuevo cliente y devuelve su ID.
      *
-     * @param array $clienteData Datos del cliente a crear.
-     * @return string Respuesta de la API.
+     * @param array $datosCliente Datos del cliente a crear.
+     * @return string ID del cliente recién creado o mensaje de error.
      * @throws Exception
      */
-    public function crearCliente(array $clienteData): string {
-        $path = "customers"; // Ajusta este endpoint a donde se deben enviar los datos para crear un cliente.
-        $data = json_encode($clienteData); // Codifica los datos del cliente como JSON.
-        $headers = [
-            'Content-Type: application/json', // Asume que la API espera JSON.
-            'Authorization: Bearer ' . $this->authtoken // Asume que usas el token de autenticación ya configurado en la clase.
-        ];
-        return $this->post($path, $data, $headers);
+    public function crearCliente(array $datosCliente): string {
+        // Endpoint para la creación del cliente
+        $path = "clientes";
+        $headers = ['Content-Type: application/json'];
+        $data = json_encode($datosCliente);
+
+        // Enviar solicitud para crear el cliente
+        $respuestaCliente = $this->post($path, $data, $headers);
+        $resultadoCliente = json_decode($respuestaCliente, true);
+
+        // Verificar la respuesta de la creación del cliente
+        if (!empty($resultadoCliente) && $resultadoCliente['status']) {
+            // Si se indica que el cliente fue añadido exitosamente, buscar al cliente para obtener su ID
+            // Asumiendo que 'company' puede usarse para buscar de manera única al cliente
+            // Buscar al cliente por el nombre de la empresa
+            $clientes = json_decode(
+                $this->buscarCliente(
+                    $datosCliente['company']
+                ), true
+            );
+
+            // Implementar la lógica para seleccionar al cliente correcto de la lista, si es necesario
+            // Esto es un ejemplo simplificado, ajusta según la estructura de tu respuesta de búsqueda
+            foreach ($clientes as $cliente) {
+                if ($cliente['name'] === $datosCliente['company']) {
+                    return $cliente['clientid']; // Devolver el ID del cliente encontrado
+                }
+            }
+
+            return "Cliente creado, pero no se encontró en la búsqueda inmediata.";
+        } else {
+            // Manejar el caso de error en la creación
+            return "Error al crear el cliente: " . $resultadoCliente['message'];
+        }
     }
 
     /**
@@ -133,29 +159,18 @@ class ApiWonline {
      * @return string Respuesta de la creación de la factura.
      */
     public function crearClienteYFactura(array $datosCliente, array $datosFactura): string {
-        // Primero, intentamos crear el cliente
-        $respuestaCliente = $this->crearCliente($datosCliente);
+        // Intentar crear el cliente y obtener el ID del cliente o un mensaje de error
+        $idCliente = $this->crearCliente($datosCliente);
 
-        // Aquí asumimos que el nombre de la compañía es único y usamos eso para buscar.
-        $nombreCliente = $datosCliente['company'];
-
-        // Buscamos al cliente para obtener su ID
-        $respuestaBusqueda = $this->buscarCliente($nombreCliente);
-        $resultadoBusqueda = json_decode($respuestaBusqueda, true);
-
-        // Asumiendo que la respuesta de búsqueda es una lista de resultados y el cliente deseado es el primer elemento
-        if (!empty($resultadoBusqueda) && isset($resultadoBusqueda[0]['clientid'])) {
-            $idCliente = $resultadoBusqueda[0]['clientid'];
-
-            // Preparar los datos de la factura, asegurando que el 'clientid' sea correcto
+        // Verificar si se obtuvo un ID de cliente
+        if (is_numeric($idCliente)) {
+            // Si se tiene un ID, preparar y enviar la factura para el cliente recién creado
             $datosFactura['clientid'] = $idCliente;
-
-            // Ahora, crear la factura para el cliente recién creado
-            return $this->agregarNuevaFactura($datosFactura);
-
+            $respuestaFactura = $this->agregarNuevaFactura($datosFactura);
+            return $respuestaFactura;
         } else {
-            // Manejar el caso en que no se encuentra el cliente
-            return "Error: Cliente no encontrado después de la creación.";
+            // Si no se obtuvo un ID de cliente, devolver el mensaje de error
+            return $idCliente; // Aquí idCliente contiene el mensaje de error
         }
     }
 
