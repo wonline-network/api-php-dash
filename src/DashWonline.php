@@ -315,13 +315,11 @@ class DashWonline {
      * @throws Exception
      */
     private function request(string $method, string $path,  $data = null, array $headers = []): string {
-        $url = $this->base_url . $path;
-        echo $url."\n";
-        print_r($data);
+
         $headers = $this->addAuthorizationHeader($headers);
 
         curl_setopt_array($this->curl, [
-            CURLOPT_URL => $url,
+            CURLOPT_URL => $this->base_url . $path,
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_RETURNTRANSFER => true,
