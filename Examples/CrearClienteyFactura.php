@@ -29,11 +29,13 @@ $datosCliente = [
 ];
 // Datos de la factura, incluyendo los items
 $datosFactura = [
-    "number" => 1001,
+    "number" => 1005,
     "date" => "2024-04-01",
     "currency" => 1,
-    "subtotal" => '1000.00', // Asegúrate de que el formato decimal sea correcto
-    "total" => '2420.00', // Asegúrate de que el formato decimal sea correcto
+    // Asegúrate de que el formato decimal sea correcto 00.00
+    "subtotal" => '1000.00',
+    // Asegúrate de que el formato decimal sea correcto 00.00
+    "total" => '2420.00',
     "billing_street" => "Calle Ficticia 123",
     "allowed_payment_modes[0]" => 1
 ];
@@ -48,9 +50,17 @@ $datosFactura = $api->addItemAFactura($datosFactura, [
     'taxname' => 'iva|21.00' // Asumiendo que 'taxname' es un array
 ]);
 
-
 // Crear el cliente y la factura
-$response = $api->crearClienteYFactura($datosCliente, $datosFactura);
+try {
 
-// Imprimir la respuesta de la API para la creación de la factura
-echo $response;
+    // Imprimir la respuesta de la API para la creación de la factura
+    echo $api->crearClienteYFactura($datosCliente, $datosFactura);
+
+} catch (Exception $e) {
+
+    // Manejar la excepción, por ejemplo, registrando el mensaje de error
+    error_log($e->getMessage());
+
+    // Opcionalmente, puedes enviar una respuesta o mensaje de error al usuario
+    echo "Ocurrió un error al crear el cliente y la factura.";
+}
