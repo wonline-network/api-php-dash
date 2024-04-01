@@ -1,12 +1,7 @@
 <?php
-
 require_once 'src/DashWonline.php';
-
-$api = new DashWonline(
-    "",
-    "..--"
-);
-
+$config = require 'config.php';
+$api = new DashWonline($config['user'], $config['api_token']);
 
 // Solicitar la información de impuestos
 $informacionImpuestos = $api->solicitarDatosImpuestos();

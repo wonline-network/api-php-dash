@@ -1,11 +1,8 @@
 <?php
-
 require_once 'src/DashWonline.php';
+$config = require 'config.php';
+$api = new DashWonline($config['user'], $config['api_token']);
 
-$api = new DashWonline(
-    "",
-    "..--"
-);
 
 // La palabra clave para buscar
 $keysearch = "empresa ejemplo s.a.";

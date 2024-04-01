@@ -43,34 +43,95 @@ class DashWonline {
      * @param array $datosCliente Datos del cliente a crear.
      * @return string ID del cliente recién creado o mensaje de error.
      * @throws Exception
+
+     * @api {post} api/customers Add New Customer
+     * @apiName PostCustomer
+     * @apiGroup Customers
+     *
+     * @apiHeader {String} Authorization Basic Access Authentication token.
+     *
+     * @apiParam {String} company               Mandatory Customer company.
+     * @apiParam {String} [vat]                 Optional Vat.
+     * @apiParam {String} [phonenumber]         Optional Customer Phone.
+     * @apiParam {String} [website]             Optional Customer Website.
+     * @apiParam {Number[]} [groups_in]         Optional Customer groups.
+     * @apiParam {String} [default_language]    Optional Customer Default Language.
+     * @apiParam {String} [default_currency]    Optional default currency.
+     * @apiParam {String} [address]             Optional Customer address.
+     * @apiParam {String} [city]                Optional Customer City.
+     * @apiParam {String} [state]               Optional Customer state.
+     * @apiParam {String} [zip]                 Optional Zip Code.
+     * @apiParam {String} [partnership_type]    Optional Customer partnership type.
+     * @apiParam {String} [country]             Optional country.
+     * @apiParam {String} [billing_street]      Optional Billing Address: Street.
+     * @apiParam {String} [billing_city]        Optional Billing Address: City.
+     * @apiParam {Number} [billing_state]       Optional Billing Address: State.
+     * @apiParam {String} [billing_zip]         Optional Billing Address: Zip.
+     * @apiParam {String} [billing_country]     Optional Billing Address: Country.
+     * @apiParam {String} [shipping_street]     Optional Shipping Address: Street.
+     * @apiParam {String} [shipping_city]       Optional Shipping Address: City.
+     * @apiParam {String} [shipping_state]      Optional Shipping Address: State.
+     * @apiParam {String} [shipping_zip]        Optional Shipping Address: Zip.
+     * @apiParam {String} [shipping_country]    Optional Shipping Address: Country.
+     *
+     * @apiParamExample {Multipart Form} Request-Example:
+     *   array (size=22)
+     *     'company' => string 'Themesic Interactive' (length=38)
+     *     'vat' => string '123456789' (length=9)
+     *     'phonenumber' => string '123456789' (length=9)
+     *     'website' => string 'AAA.com' (length=7)
+     *     'groups_in' =>
+     *       array (size=2)
+     *         0 => string '1' (length=1)
+     *         1 => string '4' (length=1)
+     *     'default_currency' => string '3' (length=1)
+     *     'default_language' => string 'english' (length=7)
+     *     'address' => string '1a The Alexander Suite Silk Point' (length=27)
+     *     'city' => string 'London' (length=14)
+     *     'state' => string 'London' (length=14)
+     *     'zip' => string '700000' (length=6)
+     *     'country' => string '243' (length=3)
+     *     'billing_street' => string '1a The Alexander Suite Silk Point' (length=27)
+     *     'billing_city' => string 'London' (length=14)
+     *     'billing_state' => string 'London' (length=14)
+     *     'billing_zip' => string '700000' (length=6)
+     *     'billing_country' => string '243' (length=3)
+     *     'shipping_street' => string '1a The Alexander Suite Silk Point' (length=27)
+     *     'shipping_city' => string 'London' (length=14)
+     *     'shipping_state' => string 'London' (length=14)
+     *     'shipping_zip' => string '700000' (length=6)
+     *     'shipping_country' => string '243' (length=3)
+     *
+     *
+     * @apiSuccess {Boolean} status Request status.
+     * @apiSuccess {String} message Customer add successful.
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "status": true,
+     *       "clientid": true,
+     *       "message": "Customer add successful."
+     *     }
+     *
+     * @apiError {Boolean} status Request status.
+     * @apiError {String} message Customer add fail.
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *       "status": false,
+     *       "message": "Customer add fail."
+     *     }
+     *
      */
     public function crearCliente(array $datosCliente): string {
-
-        // Enviar solicitud para crear el cliente
-        $respuestaCliente = $this->post("customers", $datosCliente);
-        $resultadoCliente = json_decode($respuestaCliente, true);
-
-
-        // Verificar la respuesta de la creación del cliente
-        if ($resultadoCliente['status']) {
-            // Si se indica que el cliente fue añadido exitosamente, buscar al cliente para obtener su ID
-            // Asumiendo que 'company' puede usarse para buscar de manera única al cliente
-            // Buscar al cliente por el nombre de la empresa
-
-            $clientes = json_decode(
-                $this->buscarCliente(preg_replace('/\s+(S\.A\.|S\.L\.|LLC|Inc\.|Corp\.)$/i', '', $datosCliente['company'])), true
-            );
-
-            if($clientes[0]){
-                return $clientes[0]['userid']; // Devolver el ID del cliente encontrado
-            }
-
-            return "Cliente creado, pero no se encontró en la búsqueda inmediata.";
-
-        } else {
-            // Manejar el caso de error en la creación
-            return "Error al crear el cliente: " . $resultadoCliente['message'];
+        // Enviar solicitud para crear el cliente retornando el id cliente
+        $dc = json_decode($this->post("customers", $datosCliente), true);
+        if($dc['status']){
+            return $dc['clientid'];
         }
+        return $dc['message'];
     }
 
     /**
@@ -153,17 +214,17 @@ class DashWonline {
      * @param array $datosCliente Datos del cliente a crear.
      * @param array $datosFactura Datos de la factura a crear.
      * @return string Respuesta de la creación de la factura.
+     * @throws Exception
      */
     public function crearClienteYFactura(array $datosCliente, array $datosFactura): string {
-        // Intentar crear el cliente y obtener el ID del cliente o un mensaje de error
+        // Crea el cliente y obtener el ID del cliente o un mensaje de error
         $idCliente = $this->crearCliente($datosCliente);
 
         // Verificar si se obtuvo un ID de cliente
         if (is_numeric($idCliente)) {
             // Si se tiene un ID, preparar y enviar la factura para el cliente recién creado
             $datosFactura['clientid'] = $idCliente;
-            $respuestaFactura = $this->agregarNuevaFactura($datosFactura);
-            return $respuestaFactura;
+            return $this->agregarNuevaFactura($datosFactura);
         } else {
             // Si no se obtuvo un ID de cliente, devolver el mensaje de error
             return $idCliente; // Aquí idCliente contiene el mensaje de error

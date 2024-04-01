@@ -1,8 +1,8 @@
 <?php
 
 require_once 'src/DashWonline.php';
-
-$api = new ApiWonline("tuCuentaCliente", "tuTokenDeAutenticacion");
+$config = require 'config.php';
+$api = new DashWonline($config['user'], $config['api_token']);
 
 // Datos del cliente de ejemplo
 $clienteData = [
@@ -10,17 +10,17 @@ $clienteData = [
     "vat" => "B12345678",
     "phonenumber" => "+34902020202",
     "website" => "https://empresa-ejemplo.com",
-    "groups_in" => [1, 2],
     "default_language" => "es",
     "default_currency" => "EUR",
     // Añade el resto de campos necesarios...
 ];
 
 // Llama al método para crear el cliente
-$response = $api->crearCliente($clienteData);
+try {
+    $response = $api->crearCliente($clienteData);
+} catch (Exception $e) {
+}
 
 // Imprime la respuesta de la API
 echo $response;
 
-
-?>

@@ -1,11 +1,7 @@
 <?php
-
 require_once 'src/DashWonline.php';
-
-$api = new ApiWonline(
-    "tuCuentaCliente",
-    "tuTokenDeAutenticacion"
-);
+$config = require 'config.php';
+$api = new DashWonline($config['user'], $config['api_token']);
 
 // ID del cliente cuya información deseas solicitar
 $idCliente = 123;

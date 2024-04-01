@@ -1,8 +1,7 @@
 <?php
-
-require_once 'DashWonline.php';
-
-$api = new ApiWonline("tuCuentaCliente", "tuTokenDeAutenticacion");
+require_once 'src/DashWonline.php';
+$config = require 'config.php';
+$api = new DashWonline($config['user'], $config['api_token']);
 
 // ID del cliente a actualizar y nuevos datos
 $idCliente = 123;
