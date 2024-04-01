@@ -38,6 +38,35 @@ class ApiWonline {
         $this->curl = curl_init();
     }
 
+    /**
+     * Crea un nuevo cliente en el sistema.
+     *
+     * @param array $clienteData Datos del cliente a crear.
+     * @return string Respuesta de la API.
+     */
+    public function crearCliente(array $clienteData): string {
+        $path = "customers"; // Ajusta este endpoint a donde se deben enviar los datos para crear un cliente.
+        $data = json_encode($clienteData); // Codifica los datos del cliente como JSON.
+        $headers = [
+            'Content-Type: application/json', // Asume que la API espera JSON.
+            'Authorization: Bearer ' . $this->authtoken // Asume que usas el token de autenticación ya configurado en la clase.
+        ];
+        return $this->post($path, $data, $headers);
+    }
+    /**
+     * Elimina un cliente del sistema.
+     *
+     * @param int $id ID único del cliente a eliminar.
+     * @return string Respuesta de la API.
+     */
+    public function eliminarCliente(int $id): string {
+        $path = "delete/customers/{$id}"; // Construye el path con el ID del cliente.
+        $headers = [
+            'Authorization: Bearer ' . $this->authtoken // Usa el token de autenticación configurado.
+        ];
+        return $this->delete($path, $headers);
+    }
+
     public function get($path, array $headers = []): string {
         return $this->request($path, 'GET', null, $headers);
     }
@@ -50,6 +79,20 @@ class ApiWonline {
         return $this->request($path, 'PUT', $data, $headers);
     }
 
+    public function delete($path, array $headers = []): string {
+        return $this->request('DELETE', $path, null, $headers);
+    }
+
+    /**
+     * Realiza una solicitud HTTP a la API.
+     *
+     * @param string $method Método HTTP ('GET', 'POST', 'PUT', 'DELETE').
+     * @param string $path Ruta del endpoint de la API.
+     * @param mixed $data Datos a enviar con la solicitud.
+     * @param array $headers Headers adicionales para la solicitud.
+     * @return string Respuesta de la API.
+     * @throws Exception
+     */
     private function request($path, $method, $data = null, array $headers = []): string {
         $url = $this->base_url . $path;
         $headers = $this->addAuthorizationHeader($headers);
