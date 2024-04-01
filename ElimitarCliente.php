@@ -1,4 +1,7 @@
 <?php
+
+require_once 'DashWonline.php';
+
 $api = new ApiWonline("tuCuentaCliente", "tuTokenDeAutenticacion");
 
 // ID del cliente a eliminar

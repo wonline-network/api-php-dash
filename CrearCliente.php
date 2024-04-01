@@ -1,5 +1,7 @@
 <?php
 
+require_once 'DashWonline.php';
+
 $api = new ApiWonline("tuCuentaCliente", "tuTokenDeAutenticacion");
 
 // Datos del cliente de ejemplo
