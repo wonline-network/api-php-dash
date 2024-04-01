@@ -9,7 +9,7 @@ if (version_compare(phpversion(), '7.0.0', '<')) {
  * Ha sido creada para la integración con el sistema de Wonline Network LLC.
  *
  * @package Wonline Network LLC API Wrapper
- * @version 1.1
+ * @version 1.3
  * @author Ángel Luis Marino
  * @license Propietario - Uso exclusivo de Wonline Network LLC y partes autorizadas.
  *
@@ -24,7 +24,6 @@ class DashWonline {
     private string $base_url;
     private string $authtoken;
     private $curl;
-
 
     /**
      * Constructor de la clase ApiWonline.
@@ -106,6 +105,19 @@ class DashWonline {
      * @throws Exception
      */
     public function buscarCliente(string $keysearch): string {
+        return $this->get("customers/search/{$keysearch}");
+    }
+
+    /**
+     * Busca clientes por nombre de empresa utilizando una palabra clave.
+     *
+     * @param string $keysearch La palabra clave para la búsqueda.
+     * @return string Respuesta de la API.
+     * @throws Exception
+     */
+    public function buscarCliente_NE(string $keysearch): string {
+        // Quitamos la terminación de nombres de empresa SA SL LLC INC etc
+        $keysearch = preg_replace('/\s+(S\.A\.|S\.L\.|LLC|Inc\.|Corp\.)$/i', '', $keysearch);
         return $this->get("customers/search/{$keysearch}");
     }
 

@@ -2,7 +2,7 @@
 
 require_once 'src/DashWonline.php';
 
-$api = new ApiWonline("angel", "tuTokenDeAutenticacion");
+$api = new DashWonline("angel", "tuTokenDeAutenticacion");
 
 // Datos de la nueva factura
 $datosFactura = [
@@ -10,15 +10,22 @@ $datosFactura = [
     "number" => 1001,
     "date" => "2024-04-01",
     "currency" => 1,
-    "newitems" => [
-        // Detalles de los artículos aquí
-    ],
     "subtotal" => 1000.00,
     "total" => 1150.00,
     "billing_street" => "Calle Ficticia 123",
     "allowed_payment_modes" => [1, 2],
-    // Añadir más campos según sea necesario...
 ];
+
+$datosFactura = $api->addItemAFactura($datosFactura, [
+    'description' => 'item 1 description',
+    'long_description' => 'item 1 long description',
+    'qty' => 2,
+    'rate' => 500,
+    'order' => 1,
+    'unit' => '',
+    'taxname' => 'iva|21.00' // Asumiendo que 'taxname' es un array
+]);
+
 
 // Agregar la nueva factura
 $response = $api->agregarNuevaFactura($datosFactura);
