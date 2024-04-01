@@ -12,15 +12,21 @@ $clienteData = [
     "website" => "https://empresa-ejemplo.com",
     "default_language" => "es",
     "default_currency" => "EUR",
-    // Añade el resto de campos necesarios...
 ];
 
 // Llama al método para crear el cliente
 try {
-    $response = $api->crearCliente($clienteData);
+
+    // Imprime la respuesta de la API
+    echo $api->crearCliente($clienteData);
+
 } catch (Exception $e) {
+
+    // Manejar la excepción, por ejemplo, registrando el mensaje de error
+    error_log($e->getMessage());
+    // Opcionalmente, puedes enviar una respuesta o mensaje de error al usuario
+    echo "Ocurrió un error al crear el cliente.";
 }
 
-// Imprime la respuesta de la API
-echo $response;
+
 
