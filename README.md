@@ -28,3 +28,8 @@ Un paso a paso que te dice lo que debes ejecutar para tener un entorno de desarr
 
 ```bash
 git clone url_del_repositorio
+```
+
+## 📖 Documentación
+
+Para más detalles sobre cómo utilizar la API y las funcionalidades específicas del sistema, por favor consulta la [documentación completa del proyecto](https://dash.wonlinenetwork.llc/doc-api/).
