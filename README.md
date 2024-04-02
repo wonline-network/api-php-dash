@@ -1,8 +1,11 @@
 <p align="center">
-  <img src="https://dash.wonlinenetwork.llc/media/master/public/landingpage/media/logo-wonline-alto-30px.png" alt="Wonline Logo">
+  <a href="https://wonline.network">
+    <img src="https://dash.wonlinenetwork.llc/media/master/public/landingpage/media/logo-wonline-alto-30px.png" alt="Wonline Network - Aplicaciones Web a Medida">
+  </a>
 </p>
 
-<h1 align="center">ApiWonline Cliente & Factura Sistema</h1>
+
+<a href="https://wonline.network"><h1 align="center">api DashWonline ERP y CRM</h1></a>
 
 <p align="center">
   Sistema PHP para la gestión de clientes y facturas a través de la API de Wonline.
@@ -22,13 +25,13 @@ CURL habilitado en tu instalación de PHP
 
 ### 🔧 Instalación
 
-Un paso a paso que te dice lo que debes ejecutar para tener un entorno de desarrollo ejecutandose:
+Un paso a paso que te dice lo que debes ejecutar para tener un entorno de desarrollo ejecutándose:
 
-1. Clona el repositorio en tu servidor local o de desarrollo:
-
-```bash
-git clone url_del_repositorio
-```
+1. Descárgate el código 
+2. Mételo en tu proyecto
+3. Haz un requiere como en los ficheros de ejemplo /Examples/*.php (Aquí tienes diversos ejemplos de uso práctico)
+4. Si tienes alguna duda escribenos a [info@wonline.network](mailto:info@wonline.network)
+ 
 
 ## 📖 Documentación
 
