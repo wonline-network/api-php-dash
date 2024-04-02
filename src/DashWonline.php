@@ -187,6 +187,144 @@ class DashWonline {
      *
      * @param array $datosFactura Datos de la factura a agregar.
      * @return string Respuesta de la API.
+     * @throws Exception
+     *
+     * @api {put} api/invoices/:id Update invoice
+     * @apiVersion 0.1.0
+     * @apiName PutInvoice
+     * @apiGroup Invoices
+     *
+     * @apiHeader {String} Authorization Basic Access Authentication token.
+     *
+     * @apiParam {Number}  clientid                     Mandatory Customer id.
+     *
+     * @apiParam {Number}  clientid                       Mandatory. Customer id
+     * @apiParam {Number}  number                         Mandatory. Invoice Number
+     * @apiParam {Date}    date                           Mandatory. Invoice Date
+     * @apiParam {Number}  currency                       Mandatory. currency field
+     * @apiParam {Array}   newitems                       Mandatory. New Items to be added
+     * @apiParam {Decimal}   subtotal                   Mandatory. calculation based on item Qty, Rate and Tax
+     * @apiParam {Decimal}   total                       Mandatory. calculation based on subtotal, Discount and Adjustment
+     * @apiParam {String}  billing_street                 Mandatory. Street Address
+     * @apiParam {Array}    allowed_payment_modes          Mandatory. Payment modes
+     * @apiParam {String}  [billing_city]                 Optional. City Name for billing
+     * @apiParam {String}  [billing_state]                Optional. Name of state for billing
+     * @apiParam {Number}  [billing_zip]                  Optional. Zip code
+     * @apiParam {Number}  [billing_country]              Optional. Country code
+     * @apiParam {boolean} [include_shipping="no"]        Optional. set yes if you want add Shipping Address
+     * @apiParam {boolean} [show_shipping_on_invoice]     Optional. Shows shipping details in invoice.
+     * @apiParam {String}  [shipping_street]              Optional. Address of shipping
+     * @apiParam {String}  [shipping_city]                Optional. City name for shipping
+     * @apiParam {String}  [shipping_state]               Optional. Name of state for shipping
+     * @apiParam {Number}  [shipping_zip]                 Optional. Zip code for shipping
+     * @apiParam {Number}  [shipping_country]             Optional. Country code
+     * @apiParam {Date}    [duedate]                      Optional. Due date for Invoice
+     * @apiParam {boolean} [cancel_overdue_reminders]       Optional. Prevent sending overdue remainders for invoice
+     * @apiParam {String}  [tags]                         Optional. TAGS comma separated
+     * @apiParam {Number}  [sale_agent]                   Optional. Sale Agent name
+     * @apiParam {String}  [recurring]                    Optional. recurring 1 to 12 or custom
+     * @apiParam {String}  [discount_type]                Optional. before_tax / after_tax discount type
+     * @apiParam {Number}  [repeat_every_custom]          Optional. if recurring is custom set number gap
+     * @apiParam {String}  [repeat_type_custom]           Optional. if recurring is custom set gap option day/week/month/year
+     * @apiParam {Number}  [cycles]                       Optional. number of cycles 0 for infinite
+     * @apiParam {String}  [adminnote]                    Optional. notes by admin
+     * @apiParam {Array}   [items]                        Optional. Existing items with Id
+     * @apiParam {Array}   [removed_items]                   Optional. Items to be removed
+     * @apiParam {String}    [clientnote]                   Optional. client notes
+     * @apiParam {String}    [terms]                       Optional. Terms
+     *
+     * @apiParamExample {json} Request-Example:
+     *  {
+     *        "clientid": "1",
+     *        "billing_street": "billing address",
+     *        "billing_city": "billing city name",
+     *        "billing_state": "billing state name",
+     *        "billing_zip": "billing zip code",
+     *        "billing_country": "",
+     *        "include_shipping": "on",
+     *        "show_shipping_on_invoice": "on",
+     *        "shipping_street": "shipping address",
+     *        "shipping_city": "city name",
+     *        "shipping_state": "state name",
+     *        "shipping_zip": "zip code",
+     *        "shipping_country": "",
+     *        "number": "000001",
+     *        "date": "2020-08-28",
+     *        "duedate": "2020-09-27",
+     *        "cancel_overdue_reminders": "on",
+     *        "tags": "TAG 1,TAG 2",
+     *        "allowed_payment_modes": [
+     *            "1","2"
+     *        ],
+     *        "currency": "1",
+     *        "sale_agent": "1",
+     *        "recurring": "custom",
+     *        "discount_type": "before_tax",
+     *        "repeat_every_custom": "7",
+     *        "repeat_type_custom": "day",
+     *        "cycles": "0",
+     *        "adminnote": "TEST",
+     *        "show_quantity_as": "1",
+     *        "items": {
+     *            "1": {
+     *                "itemid": "1",
+     *                "order": "1",
+     *                "description": "item description",
+     *                "long_description": "item long description",
+     *                "qty": "1",
+     *                "unit": "1",
+     *                "rate": "10.00"
+     *            }
+     *        },
+     *        "removed_items": [
+     *            "2",
+     *            "3"
+     *        ],
+     *        "newitems": {
+     *            "2": {
+     *                "order": "2",
+     *                "description": "item 2 description",
+     *                "long_description": "item 2 logn description",
+     *                "qty": "1",
+     *                "unit": "",
+     *                "rate": "100.00"
+     *            }
+     *        },
+     *        "subtotal": "10.00",
+     *        "discount_percent": "10",
+     *        "discount_total": "1.00",
+     *        "adjustment": "1",
+     *        "total": "10.00",
+     *        "clientnote": "client note",
+     *        "terms": "terms"
+     *    }
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "status": false,
+     *       "message": "Invoice Updated Successfully"
+     *     }
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *       "status": false,
+     *       "message": "Invoice Update Fail"
+     *     }
+     *
+     * @apiError {String} number The Invoice number is already in use
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 409 Conflict
+     *     {
+     *       "status": false,
+     *       "error": {
+     *            "number":"The Invoice number is already in use"
+     *        },
+     *        "message": "The Invoice number is already in use"
+     *     }
+     *
      */
     public function agregarNuevaFactura(array $datosFactura): string {
         // Endpoint para agregar una nueva factura.
@@ -256,17 +394,114 @@ class DashWonline {
         // Añade el nuevo ítem a 'newitems' usando el índice calculado
         foreach ($nuevoItem as $key => $value) {
             if ($key === "taxname" && is_array($value)) {
+
                 // Para 'taxname' que es un array, manejar cada valor de taxname individualmente
                 foreach ($value as $taxIndex => $taxValue) {
                     $datosFactura["newitems[$index][$key][$taxIndex]"] = $taxValue;
                 }
             } else {
+
                 // Para todos los otros campos del ítem
                 $datosFactura["newitems[$index][$key]"] = $value;
             }
         }
 
         return $datosFactura;
+    }
+
+
+    /**
+     * Lista todos los pagos o un pago específico si se proporciona un ID.
+     *
+     * @param int|null $paymentId ID único del pago (opcional).
+     * @return string Respuesta de la API en formato de cadena.
+     * @throws Exception
+     */
+    public function listarPagos(?int $paymentId = null): string {
+        $path = "payments";
+        if (!is_null($paymentId)) {
+            $path .= "/{$paymentId}";
+        }
+
+        return $this->get($path);
+    }
+
+    /**
+     * Añade un nuevo contacto a través de la API.
+     *
+     * @param array $datosContacto Datos del contacto a añadir.
+     * @return string Respuesta de la API en formato de cadena.
+     * @throws Exception
+     *
+     * @api {post} api/contacts/ Add New Contact
+     * @apiVersion 0.1.0
+     * @apiName PostContact
+     * @apiGroup Contacts
+     *
+     * @apiHeader {String} Authorization Basic Access Authentication token
+     *
+     * @apiParam {Number} customer_id               Mandatory Customer id.
+     * @apiParam {String} firstname                Mandatory First Name
+     * @apiParam {String} lastname                    Mandatory Last Name
+     * @apiParam {String} email                    Mandatory E-mail
+     * @apiParam {String} [title]                    Optional Position
+     * @apiParam {String} [phonenumber]            Optional Phone Number
+     * @apiParam {String} [direction = 'rtl']       Optional Direction (rtl or ltr)
+     * @apiParam {String} [password]                Optional password (only required if you pass send_set_password_email parameter)
+     * @apiParam {String} [is_primary = 'on']       Optional Primary Contact (set on or don't pass it)
+     * @apiParam {String} [donotsendwelcomeemail]   Optional Do Not Send Welcome Email (set on or don't pass it)
+     * @apiParam {String} [send_set_password_email] Optional Send Set Password Email (set on or don't pass it)
+     * @apiParam {Array}  [permissions]            Optional Permissions for this contact(["1", "2", "3", "4", "5", "6" ])<br/>
+     *                                                            [<br/>
+     *                                                                "1",    // Invoices permission<br/>
+     *                                                                "2",    // Estimates permission<br/>
+     *                                                                "3",    // Contracts permission<br/>
+     *                                                                "4",    // Proposals permission<br/>
+     *                                                                "5",    // Support permission<br/>
+     *                                                                "6"     // Projects permission<br/>
+     *                                                            ]
+     * @apiParam {String} [invoice_emails = "invoice_emails"]            Optional E-Mail Notification for Invoices (set value same as name or don't pass it)
+     * @apiParam {String} [estimate_emails = "estimate_emails"]         Optional E-Mail Notification for Estimate (set value same as name or don't pass it)
+     * @apiParam {String} [credit_note_emails = "credit_note_emails"]   Optional E-Mail Notification for Credit Note (set value same as name or don't pass it)
+     * @apiParam {String} [project_emails = "project_emails"]            Optional E-Mail Notification for Project (set value same as name or don't pass it)
+     * @apiParam {String} [ticket_emails = "ticket_emails"]            Optional E-Mail Notification for Tickets (set value same as name or don't pass it)
+     * @apiParam {String} [task_emails = "task_emails"]                Optional E-Mail Notification for Task (set value same as name or don't pass it)
+     * @apiParam {String} [contract_emails ="contract_emails"]            Optional E-Mail Notification for Contract (set value same as name or don't pass it)
+     *
+     * @apiSuccess {Boolean} status Request status.
+     * @apiSuccess {String} message Contact added successfully.
+     *
+     * @apiSuccessExample Success-Response:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "status": true,
+     *       "message": "Contact added successfully"
+     *     }
+     *
+     * @apiError {Boolean} status Request status
+     * @apiError {String} message Contact add fail
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 404 Not Found
+     *     {
+     *       "status": false,
+     *       "message": "Contact add fail"
+     *     }
+     *
+     * @apiError {String} email This Email is already exists
+     *
+     * @apiErrorExample Error-Response:
+     *     HTTP/1.1 409 Conflict
+     *     {
+     *       "status": false,
+     *       "error": {
+     *            "email":"This Email is already exists"
+     *        },
+     *        "message": "This Email is already exists"
+     *     }
+     */
+    public function crearContactoCliente(array $datosContacto): string {
+        return $this->post("contacts/", $datosContacto,);
     }
 
     /**

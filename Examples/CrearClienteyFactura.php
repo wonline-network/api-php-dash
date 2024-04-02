@@ -29,7 +29,7 @@ $datosCliente = [
 ];
 // Datos de la factura, incluyendo los items
 $datosFactura = [
-    "number" => 1005,
+    "number" => rand(1007,1007100710071007),
     "date" => "2024-04-01",
     "currency" => 1,
     // Asegúrate de que el formato decimal sea correcto 00.00
@@ -37,7 +37,11 @@ $datosFactura = [
     // Asegúrate de que el formato decimal sea correcto 00.00
     "total" => '2420.00',
     "billing_street" => "Calle Ficticia 123",
-    "allowed_payment_modes[0]" => 1
+    "allowed_payment_modes[0]" => 'stripe',
+
+  /* "recurring" => 1, // Optional. recurring 1 to 12 or custom
+    "repeat_type_custom" => "month", // Optional. if recurring is custom set gap option day/week/month/year
+    "sale_agent" => 1*/
 ];
 
 $datosFactura = $api->addItemAFactura($datosFactura, [
@@ -47,8 +51,11 @@ $datosFactura = $api->addItemAFactura($datosFactura, [
     'rate' => 500,
     'order' => 1,
     'unit' => '',
-    'taxname' => 'iva|21.00' // Asumiendo que 'taxname' es un array
 ]);
+
+
+
+//$datosFactura["newitems[taxname]"] = 'iva|21.00';
 
 // Crear el cliente y la factura
 try {
