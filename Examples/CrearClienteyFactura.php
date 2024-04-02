@@ -3,10 +3,11 @@ require_once 'src/DashWonline.php';
 $config = require 'config.php';
 $api = new DashWonline($config['user'], $config['api_token']);
 
+$nombre_unico_cliente = rand(0,321654987);
 // Datos del cliente
 $datosCliente = [
-    "company" => "Empresa Ejemplo S.A.",
-    "vat" => "ESB123456789",
+    "company" => $nombre_unico_cliente." Empresa Ejemplo S.A.",
+    "vat" => "ESB".$nombre_unico_cliente,
     "phonenumber" => "+34902123456",
     "website" => "https://empresa-ejemplo.com",
     "default_language" => "es",
@@ -47,14 +48,24 @@ $datosFactura = [
   */
 ];
 
-$datosFactura = $api->addItemAFactura($datosFactura, [
-    'description' => 'item 1 description',
-    'long_description' => 'item 1 long description',
-    'qty' => 2,
-    'rate' => 500,
-    'order' => 1,
-    'unit' => '',
-]);
+$datosFactura = $api->addItemAFactura(
+    $datosFactura, [
+        'newitems' => [[
+                'description' => 'item 1 description',
+                'long_description' => 'item 1 long description',
+                'qty' => 2,
+                'rate' => 500,
+                'order' => 1,
+                'unit' => '',
+            ],[
+                'description' => 'item 2 description',
+                'long_description' => 'item 2 long description',
+                'qty' => 2,
+                'rate' => 500,
+                'order' => 1,
+                'unit' => '',
+        ]]
+    ]);
 
 $datosFactura["newitems[0][taxname][]"] = 'iva|21.00';
 
@@ -62,7 +73,7 @@ $datosFactura["newitems[0][taxname][]"] = 'iva|21.00';
 $datosContacto = [
     "firstname" => "Juan",
     "lastname" => "Pérez",
-    "email" => "github@angelluis.es",
+    "email" => "github".rand(0,321654987)."@angelluis.es",
     'send_set_password_email' => true
     // Añade aquí otros campos opcionales según sea necesario
 ];

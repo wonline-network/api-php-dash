@@ -326,13 +326,14 @@ class DashWonline {
      *     }
      *
      */
-    public function agregarNuevaFactura(array $datosFactura): string {
+    public function agregarNuevaFactura(array $datosFactura) {
         // Endpoint para agregar una nueva factura.
         $r_factura = json_decode($this->post("invoices", $datosFactura), true);
 
         /**
-         *  Si todo va bien retorna el mensaje de ok y si no el error
+         **  Si todo va bien retorna el mensaje de ok y si no el error
          */
+        print_r($datosFactura);
         return ($r_factura['status'])?$r_factura['message']:$r_factura['error'];
     }
 
@@ -359,7 +360,7 @@ class DashWonline {
      * @return string Respuesta de la creación de la factura.
      * @throws Exception
      */
-    public function crearClienteYFactura(array $datosCliente, array $datosFactura, array $datosContacto): array {
+    public function crearClienteYFactura(array $datosCliente, array $datosFactura, array $datosContacto) {
 
         // Crea el cliente y obtener el ID del cliente o un mensaje de error
         $idCliente = $this->crearCliente($datosCliente);
@@ -381,48 +382,25 @@ class DashWonline {
             // Si se tiene un ID, preparar y enviar la factura para el cliente recién creado
             $datosFactura['clientid'] = $idCliente;
             return $this->agregarNuevaFactura($datosFactura);
+
         }  else {
             // Si no se obtuvo un ID de cliente, devolver el mensaje de error
             return $datosFactura['clientid']; // Aquí idCliente contiene el mensaje de error
         }
     }
 
+
     public function addItemAFactura(array &$datosFactura, array $item): array
     {
-        // Inicializar 'newitems' como array si aún no se ha hecho
-        if (!isset($datosFactura['newitems'])) {
-            $datosFactura['newitems'] = [];
-        }
-
-        // El índice para el nuevo ítem se basa en la cantidad de ítems actualmente en 'newitems'
-        $index = count($datosFactura['newitems']);
-
-        // Construye el nuevo ítem y añádelo al array 'newitems'
-        $nuevoItem = [
-            "description" => $item['description'],
-            "long_description" => $item['long_description'],
-            "qty" => $item['qty'],
-            "rate" => $item['rate'],
-            "order" => $item['order'],
-            "unit" => $item['unit'],
-            "taxname" => $item['taxname'] ?? []
-        ];
-
+        $cuenta_que = 0;
         // Añade el nuevo ítem a 'newitems' usando el índice calculado
-        foreach ($nuevoItem as $key => $value) {
-            if ($key === "taxname" && is_array($value)) {
-
-                // Para 'taxname' que es un array, manejar cada valor de taxname individualmente
-                foreach ($value as $taxIndex => $taxValue) {
-                    $datosFactura["newitems[$index][$key][$taxIndex]"] = $taxValue;
-                }
-            } else {
-
-                // Para todos los otros campos del ítem
-                $datosFactura["newitems[$index][$key]"] = $value;
+        foreach ($item['newitems'] as $value) {
+            /* Para todos los otros campos del ítem */
+            foreach ($value as $eresClave => $valOrate){
+                $datosFactura["newitems[$cuenta_que][$eresClave]"] = $valOrate;
             }
+            $cuenta_que++;
         }
-
         return $datosFactura;
     }
 
