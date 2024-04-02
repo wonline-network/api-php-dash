@@ -27,6 +27,7 @@ $datosCliente = [
     "shipping_zip" => "08080",
     "shipping_country" => "ES",
 ];
+
 // Datos de la factura, incluyendo los items
 $datosFactura = [
     "number" => rand(1007,1007100710071007),
@@ -39,9 +40,11 @@ $datosFactura = [
     "billing_street" => "Calle Ficticia 123",
     "allowed_payment_modes[0]" => 'stripe',
 
-  /* "recurring" => 1, // Optional. recurring 1 to 12 or custom
+  /*
+    "recurring" => 1, // Optional. recurring 1 to 12 or custom
     "repeat_type_custom" => "month", // Optional. if recurring is custom set gap option day/week/month/year
-    "sale_agent" => 1*/
+    "sale_agent" => 1
+  */
 ];
 
 $datosFactura = $api->addItemAFactura($datosFactura, [
@@ -53,9 +56,7 @@ $datosFactura = $api->addItemAFactura($datosFactura, [
     'unit' => '',
 ]);
 
-
-
-//$datosFactura["newitems[taxname]"] = 'iva|21.00';
+$datosFactura["newitems[0][taxname][]"] = 'iva|21.00';
 
 // Crear el cliente y la factura
 try {
