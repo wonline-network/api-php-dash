@@ -329,6 +329,7 @@ class DashWonline {
     public function agregarNuevaFactura(array $datosFactura): string {
         // Endpoint para agregar una nueva factura.
         $r_factura = json_decode($this->post("invoices", $datosFactura), true);
+
         /**
          *  Si todo va bien retorna el mensaje de ok y si no el error
          */
@@ -358,7 +359,7 @@ class DashWonline {
      * @return string Respuesta de la creación de la factura.
      * @throws Exception
      */
-    public function crearClienteYFactura(array $datosCliente, array $datosFactura, array $datosContacto): mixed {
+    public function crearClienteYFactura(array $datosCliente, array $datosFactura, array $datosContacto): array {
 
         // Crea el cliente y obtener el ID del cliente o un mensaje de error
         $idCliente = $this->crearCliente($datosCliente);
@@ -370,7 +371,8 @@ class DashWonline {
 
             // verificamos si el contacto creado no existe
             if(!$response['status']){
-               return $response['error'];
+
+               return $response;
             }
         }
 
@@ -516,7 +518,12 @@ class DashWonline {
      *        "message": "This Email is already exists"
      *     }
      */
-    public function crearContactoCliente(array $datosContacto): string {
+    public function crearContactoCliente(array $datosContacto, $primario = 0): string {
+
+        // Definimos si el contacto de cliente es primario o no
+        if($primario){
+            $datosContacto['is_primary'] = 'on';
+        }
         return $this->post("contacts/", $datosContacto,);
     }
 

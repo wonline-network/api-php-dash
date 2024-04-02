@@ -71,7 +71,7 @@ $datosContacto = [
 try {
 
     // Imprimir la respuesta de la API para la creación de la factura
-    echo $api->crearClienteYFactura($datosCliente, $datosFactura, $datosContacto);
+    print_r($api->crearClienteYFactura($datosCliente, $datosFactura, $datosContacto));
 
 } catch (Exception $e) {
 
