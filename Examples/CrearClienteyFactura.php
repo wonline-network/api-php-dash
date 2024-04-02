@@ -58,11 +58,20 @@ $datosFactura = $api->addItemAFactura($datosFactura, [
 
 $datosFactura["newitems[0][taxname][]"] = 'iva|21.00';
 
+
+$datosContacto = [
+    "firstname" => "Juan",
+    "lastname" => "Pérez",
+    "email" => "github@angelluis.es",
+    'send_set_password_email' => true
+    // Añade aquí otros campos opcionales según sea necesario
+];
+
 // Crear el cliente y la factura
 try {
 
     // Imprimir la respuesta de la API para la creación de la factura
-    echo $api->crearClienteYFactura($datosCliente, $datosFactura);
+    echo $api->crearClienteYFactura($datosCliente, $datosFactura, $datosContacto);
 
 } catch (Exception $e) {
 

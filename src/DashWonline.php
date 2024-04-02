@@ -302,7 +302,7 @@ class DashWonline {
      * @apiSuccessExample Success-Response:
      *     HTTP/1.1 200 OK
      *     {
-     *       "status": false,
+     *       "status": true,
      *       "message": "Invoice Updated Successfully"
      *     }
      *
@@ -328,7 +328,11 @@ class DashWonline {
      */
     public function agregarNuevaFactura(array $datosFactura): string {
         // Endpoint para agregar una nueva factura.
-        return $this->post("invoices", $datosFactura);
+        $r_factura = json_decode($this->post("invoices", $datosFactura), true);
+        /**
+         *  Si todo va bien retorna el mensaje de ok y si no el error
+         */
+        return ($r_factura['status'])?$r_factura['message']:$r_factura['error'];
     }
 
     /**
@@ -354,10 +358,21 @@ class DashWonline {
      * @return string Respuesta de la creación de la factura.
      * @throws Exception
      */
-    public function crearClienteYFactura(array $datosCliente, array $datosFactura): string {
+    public function crearClienteYFactura(array $datosCliente, array $datosFactura, array $datosContacto): mixed {
 
         // Crea el cliente y obtener el ID del cliente o un mensaje de error
         $idCliente = $this->crearCliente($datosCliente);
+
+        if(!empty($datosContacto)){
+
+            $datosContacto["customer_id"] = $idCliente;
+            $response = json_decode($this->crearContactoCliente($datosContacto), true);
+
+            // verificamos si el contacto creado no existe
+            if(!$response['status']){
+               return $response['error'];
+            }
+        }
 
         // Verificar si se obtuvo un ID de cliente
         if (is_numeric($idCliente)) {
@@ -440,11 +455,12 @@ class DashWonline {
      *
      * @apiHeader {String} Authorization Basic Access Authentication token
      *
-     * @apiParam {Number} customer_id               Mandatory Customer id.
+     * @apiParam {Number} customer_id              Mandatory Customer id.
      * @apiParam {String} firstname                Mandatory First Name
-     * @apiParam {String} lastname                    Mandatory Last Name
+     * @apiParam {String} lastname                 Mandatory Last Name
      * @apiParam {String} email                    Mandatory E-mail
-     * @apiParam {String} [title]                    Optional Position
+     *
+     * @apiParam {String} [title]                  Optional Position
      * @apiParam {String} [phonenumber]            Optional Phone Number
      * @apiParam {String} [direction = 'rtl']       Optional Direction (rtl or ltr)
      * @apiParam {String} [password]                Optional password (only required if you pass send_set_password_email parameter)
@@ -508,6 +524,7 @@ class DashWonline {
      * Solicita la información de los impuestos.
      *
      * @return string Respuesta de la API.
+     * @throws Exception
      */
     public function solicitarDatosImpuestos(): string {
         return $this->get("common/tax_data");
