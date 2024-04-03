@@ -3,13 +3,13 @@ if (version_compare(phpversion(), '7.0.0', '<')) {
     die('Este script requiere al menos PHP 7.0.0');
 }
 /**
- * Clase ApiWonline
+ * Clase DashWonline
  *
  * Esta clase proporciona una envoltura para realizar llamadas API utilizando cURL.
  * Ha sido creada para la integración con el sistema de Wonline Network LLC.
  *
  * @package Wonline Network LLC API Wrapper
- * @version 1.3
+ * @version 1.4
  * @author Ángel Luis Marino
  * @license Propietario - Uso exclusivo de Wonline Network LLC y partes autorizadas.
  *
@@ -397,7 +397,11 @@ class DashWonline {
         foreach ($item['newitems'] as $value) {
             /* Para todos los otros campos del ítem */
             foreach ($value as $eresClave => $valOrate){
-                $datosFactura["newitems[$cuenta_que][$eresClave]"] = $valOrate;
+                if($eresClave == 'taxname'){
+                    $datosFactura["newitems[$cuenta_que][$eresClave][]"] = $valOrate;
+                } else {
+                    $datosFactura["newitems[$cuenta_que][$eresClave]"] = $valOrate;
+                }
             }
             $cuenta_que++;
         }

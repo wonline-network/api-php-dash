@@ -57,6 +57,7 @@ $datosFactura = $api->addItemAFactura(
                 'rate' => 500,
                 'order' => 1,
                 'unit' => '',
+            'taxname' => 'iva|21.00' // Este es un ejemplo usa el nombre de tu taxname1
             ],[
                 'description' => 'item 2 description',
                 'long_description' => 'item 2 long description',
@@ -64,10 +65,9 @@ $datosFactura = $api->addItemAFactura(
                 'rate' => 500,
                 'order' => 1,
                 'unit' => '',
+            'taxname' => 'iva|21.00' // Este es un ejemplo usa el nombre de tu taxname2
         ]]
     ]);
-
-$datosFactura["newitems[0][taxname][]"] = 'iva|21.00';
 
 
 $datosContacto = [
