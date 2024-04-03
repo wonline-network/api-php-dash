@@ -389,25 +389,40 @@ class DashWonline {
         }
     }
 
-
+    /**
+     * Añade ítems a una estructura de factura existente.
+     *
+     * Esta función toma dos argumentos: una referencia a un array que representa
+     * la estructura de datos de una factura y un array que contiene los nuevos ítems
+     * a añadir a la factura. La función modifica el array de la factura directamente,
+     * añadiendo los nuevos ítems. Los ítems pueden incluir un campo especial 'taxname',
+     * que se maneja de manera diferente a los demás campos.
+     *
+     * @param array &$datosFactura Una referencia al array de la factura a modificar.
+     * @param array $item El array que contiene los nuevos ítems a añadir a la factura.
+     * @return array El array de la factura modificado con los nuevos ítems añadidos.
+     */
     public function addItemAFactura(array &$datosFactura, array $item): array
     {
-        $cuenta_que = 0;
-        // Añade el nuevo ítem a 'newitems' usando el índice calculado
+        $cuenta_que = 0; // Contador para iterar sobre los nuevos ítems.
+
+        // Itera sobre cada nuevo ítem proporcionado en el argumento $item.
         foreach ($item['newitems'] as $value) {
-            /* Para todos los otros campos del ítem */
+            // Itera sobre cada campo de un ítem.
             foreach ($value as $eresClave => $valOrate){
+                // Si el campo es 'taxname', lo añade de una manera especial.
                 if($eresClave == 'taxname'){
+                    // Añade el valor de 'taxname' a una lista (array) bajo el ítem correspondiente.
                     $datosFactura["newitems[$cuenta_que][$eresClave][]"] = $valOrate;
                 } else {
+                    // Para todos los otros campos, simplemente asigna el valor al campo correspondiente.
                     $datosFactura["newitems[$cuenta_que][$eresClave]"] = $valOrate;
                 }
             }
-            $cuenta_que++;
+            $cuenta_que++; // Incrementa el contador para pasar al siguiente ítem.
         }
-        return $datosFactura;
+        return $datosFactura; // Devuelve el array de la factura modificado.
     }
-
 
     /**
      * Lista todos los pagos o un pago específico si se proporciona un ID.
