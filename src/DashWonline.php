@@ -390,17 +390,22 @@ class DashWonline {
     }
 
     /**
-     * Añade ítems a una estructura de factura existente.
+     * Añade ítems a una estructura de factura existente y calcula el nuevo subtotal y total.
      *
-     * Esta función toma dos argumentos: una referencia a un array que representa
-     * la estructura de datos de una factura y un array que contiene los nuevos ítems
-     * a añadir a la factura. La función modifica el array de la factura directamente,
-     * añadiendo los nuevos ítems. Los ítems pueden incluir un campo especial 'taxname',
-     * que se maneja de manera diferente a los demás campos.
+     * Esta función toma una referencia a un array que representa la estructura de datos de una factura
+     * y un array que contiene los nuevos ítems a añadir a esta factura. Los ítems pueden incluir un
+     * campo especial 'taxname', el cual se maneja de manera diferente a los demás campos, ya que
+     * incluye tanto el nombre del impuesto como la tasa aplicable, separados por un '|'. La función
+     * modifica directamente el array de la factura, añadiendo los nuevos ítems y recalculando el
+     * subtotal y total considerando los impuestos especificados.
      *
-     * @param array &$datosFactura Una referencia al array de la factura a modificar.
-     * @param array $item El array que contiene los nuevos ítems a añadir a la factura.
-     * @return array El array de la factura modificado con los nuevos ítems añadidos.
+     * @param array &$datosFactura Una referencia al array de la factura a modificar. Este array se
+     *                             modifica directamente para incluir los nuevos ítems y actualizar
+     *                             los valores de 'subtotal' y 'total'.
+     * @param array $item El array que contiene los nuevos ítems a añadir a la factura. Cada ítem
+     *                    puede tener una clave 'taxname' que indica el impuesto aplicable.
+     * @return array El array de la factura modificado con los nuevos ítems añadidos y los valores
+     *               de 'subtotal' y 'total' actualizados.
      */
     public function addItemAFactura(array &$datosFactura, array $item): array
     {
@@ -409,9 +414,9 @@ class DashWonline {
         // Itera sobre cada nuevo ítem proporcionado en el argumento $item.
         foreach ($item['newitems'] as $value) {
             // Itera sobre cada campo de un ítem.
-            foreach ($value as $eresClave => $valOrate){
+            foreach ($value as $eresClave => $valOrate) {
                 // Si el campo es 'taxname', lo añade de una manera especial.
-                if($eresClave == 'taxname'){
+                if ($eresClave == 'taxname') {
                     // Añade el valor de 'taxname' a una lista (array) bajo el ítem correspondiente.
                     $datosFactura["newitems[$cuenta_que][$eresClave][]"] = $valOrate;
                 } else {
@@ -421,8 +426,35 @@ class DashWonline {
             }
             $cuenta_que++; // Incrementa el contador para pasar al siguiente ítem.
         }
-        return $datosFactura; // Devuelve el array de la factura modificado.
+
+        $subtotal = 0;
+        $impuestosTotales = 0;
+
+        // Recalcula el subtotal y los impuestos para los nuevos ítems.
+        foreach ($item['newitems'] as $item) {
+            // Calcula el subtotal por ítem multiplicando cantidad por precio unitario.
+            $itemSubtotal = $item['qty'] * $item['rate'];
+            $subtotal += $itemSubtotal;
+
+            // Si el ítem tiene un 'taxname', extrae la tasa de impuesto y calcula el impuesto.
+            if (isset($item['taxname'])) {
+                // Separa el nombre del impuesto y la tasa usando explode().
+                list($taxName, $taxRate) = explode('|', $item['taxname']);
+                $taxRate = (float)$taxRate / 100; // Convierte la tasa a un decimal.
+
+                // Calcula el impuesto para ese ítem.
+                $impuestoItem = $itemSubtotal * $taxRate;
+                $impuestosTotales += $impuestoItem;
+            }
+        }
+
+        // Actualiza los valores de 'subtotal' y 'total' en el array de la factura.
+        $datosFactura['subtotal'] = number_format($subtotal, 2, '.', '');
+        $datosFactura['total'] = number_format($subtotal + $impuestosTotales, 2, '.', '');
+
+        return $datosFactura;
     }
+
 
     /**
      * Lista todos los pagos o un pago específico si se proporciona un ID.

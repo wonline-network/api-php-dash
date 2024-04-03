@@ -35,9 +35,7 @@ $datosFactura = [
     "date" => "2024-04-01",
     "currency" => 1,
     // Asegúrate de que el formato decimal sea correcto 00.00
-    "subtotal" => '1000.00',
-    // Asegúrate de que el formato decimal sea correcto 00.00
-    "total" => '2420.00',
+
     "billing_street" => "Calle Ficticia 123",
     "allowed_payment_modes[0]" => 'stripe',
 
@@ -53,18 +51,26 @@ $datosFactura = $api->addItemAFactura(
         'newitems' => [[
                 'description' => 'item 1 description',
                 'long_description' => 'item 1 long description',
-                'qty' => 2,
-                'rate' => 500,
+                'qty' => 1,
+                'rate' => 1,
                 'order' => 1,
                 'unit' => '',
             'taxname' => 'iva|21.00' // Este es un ejemplo usa el nombre de tu taxname1
             ],[
                 'description' => 'item 2 description',
                 'long_description' => 'item 2 long description',
-                'qty' => 2,
-                'rate' => 500,
+                'qty' => 1,
+                'rate' => 1,
                 'order' => 1,
                 'unit' => '',
+            'taxname' => 'iva|21.00' // Este es un ejemplo usa el nombre de tu taxname2
+        ],[
+            'description' => 'item 3 description',
+            'long_description' => 'item 3 long description',
+            'qty' => 1,
+            'rate' => 1,
+            'order' => 1,
+            'unit' => '',
             'taxname' => 'iva|21.00' // Este es un ejemplo usa el nombre de tu taxname2
         ]]
     ]);
